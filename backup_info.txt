@@ -1,0 +1,7 @@
+Name: backup_info.txt
+From: C:\Users\User\Desktop\Python\Projects\Automatic-backup-to-flash-drive\backup_info.txt
+Modified: 2024-11-27 20:12:37
+To: /
+Backup: never
+Size: 0
+Hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

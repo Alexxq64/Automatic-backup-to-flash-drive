@@ -22,11 +22,11 @@ def choose_file(prompt="Choose a file"):
     """Открывает диалог выбора файла."""
     return filedialog.askopenfilename(title=prompt)
 
-def get_default_metadata_path():
-    """Возвращает путь для файла метаданных по умолчанию."""
-    desktop = os.path.join(os.path.expanduser("~"), "Desktop")
-    return os.path.join(desktop, "filesToBackUp.txt")
-
+# def get_default_metadata_path():
+#     """Возвращает путь для файла метаданных по умолчанию."""
+#     desktop = os.path.join(os.path.expanduser("~"), "Desktop")
+#     return os.path.join(desktop, "filesToBackUp.txt")
+#
 def write_metadata_entry(meta_file, name, from_path, modified, to_path="null", backup_date="null", size=0, file_hash=""):
     """Записывает одну запись метаданных в файл."""
     meta_file.write(f"Name: {name}\n")
@@ -38,65 +38,84 @@ def write_metadata_entry(meta_file, name, from_path, modified, to_path="null", b
     meta_file.write(f"Hash: {file_hash}\n")
     meta_file.write("-" * 40 + "\n")
 
+import os
+import hashlib
+from datetime import datetime
+from setSystemPath import set_environment_variable_to_program_path
+
+import os
+import hashlib
+from datetime import datetime
+
+METADATA_FILENAME = "metadata.txt"
+ENV_VAR_NAME = "AUTOMATIC_BACKUP_TO_FLASH_DRIVE"
+
+
 def add_source_file():
     """
-    Добавляет новый файл-источник в файл метаданных.
-    Если файл метаданных ещё не существует, создаёт его.
+    Создаёт файл метаданных в папке программы при первом запуске.
+    Устанавливает переменную среды AUTOMATIC_BACKUP_TO_FLASH_DRIVE с путём к этой папке.
+    Добавляет данные о новом файле в метаданные.
     """
-    # Выбор или создание файла метаданных
-    metadata_file = filedialog.asksaveasfilename(
-        title="Создать или выбрать файл метаданных",
-        defaultextension=".txt",
-        filetypes=[("Text Files", "*.txt")],
-        initialfile=os.path.basename(get_default_metadata_path()),
-        initialdir=os.path.dirname(get_default_metadata_path())
-    )
-    if not metadata_file:
-        print("Операция отменена.")
-        return
+    # Определяем путь к папке программы
+    program_path = os.getcwd()  # Текущая рабочая директория (папка программы)
+    metadata_file = os.path.join(program_path, METADATA_FILENAME)
 
-    # Проверка, является ли файл метаданных новым
+    # Проверяем, существует ли файл метаданных
     is_new_metadata_file = not os.path.exists(metadata_file)
 
-    # Если файл метаданных новый, то инициализируем параметры для первой записи
+    # Параметры для записи в файл метаданных
     if is_new_metadata_file:
-        creation_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        initial_modified = "null"
-        initial_backup = "null"
-        initial_to = "null"
-        file_name = os.path.basename(metadata_file)
+        print(f"Файл метаданных не найден. Создаём новый: {metadata_file}")
+        # Устанавливаем переменную среды только если файл метаданных был создан
+        set_environment_variable_to_program_path()
+
+        # Данные для записи самого метаданных
+        file_name = METADATA_FILENAME
+        from_path = metadata_file
+        modified_time = "null"
+        to_path = "null"
+        backup_date = "null"
         file_size = 0
         file_hash = hashlib.md5(b"").hexdigest()
-    else:
-        # Для добавления новых файлов в уже существующий файл
-        initial_modified = "null"  # В первой записи для нового файла будет "null"
-        initial_backup = "null"  # Для первого добавления резервного копирования
-        initial_to = "null"  # Путь назначения пока не установлен
 
-        # Выбор файла для добавления в метаданные
+        # Создание записи о самом файле метаданных
+        first_entry = True
+    else:
+        # Если файл метаданных уже существует, то будем добавлять новый файл
+        print(f"Файл метаданных найден: {metadata_file}")
+
+        # Выбор нового файла для добавления в метаданные
         source_file = choose_file("Выберите файл для резервного копирования")
         if not source_file:
             print("Файл не выбран. Операция отменена.")
             return
 
-        # Сбор данных о выбранном файле
+        # Данные для записи нового файла
         file_name = os.path.basename(source_file)
+        from_path = source_file
+        modified_time = datetime.fromtimestamp(os.path.getmtime(source_file)).strftime('%Y-%m-%d %H:%M:%S')
+        to_path = "null"
+        backup_date = "null"
         file_size = os.path.getsize(source_file)
         file_hash = calculate_file_hash(source_file)
-        initial_modified = datetime.datetime.fromtimestamp(os.path.getmtime(source_file)).strftime('%Y-%m-%d %H:%M:%S')
 
-    # Открытие файла метаданных для записи
-    with open(metadata_file, "a" if not is_new_metadata_file else "w") as meta_file:
-        # Вызов записи метаданных с нужными параметрами
+        first_entry = False
+
+    # Открытие файла метаданных и запись
+    with open(metadata_file, "a" if not first_entry else "w") as meta_file:
         write_metadata_entry(
             meta_file=meta_file,
             name=file_name,
-            from_path=source_file if not is_new_metadata_file else metadata_file,
-            modified=initial_modified,
-            to_path=initial_to,
-            backup_date=initial_backup,
+            from_path=from_path,
+            modified=modified_time,
+            to_path=to_path,
+            backup_date=backup_date,
             size=file_size,
             file_hash=file_hash
         )
 
     print(f"Запись для файла {file_name} добавлена в файл метаданных.")
+
+
+add_source_file()

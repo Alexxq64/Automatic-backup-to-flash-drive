@@ -1,0 +1,32 @@
+Name: metadata.txt
+From: C:\Users\User\Desktop\Python\Projects\Automatic-backup-to-flash-drive\metadata.txt
+Modified: null
+To: metadata.txt
+Backup: 2024-11-27 09:21:50
+Size: 754 bytes
+Hash: 83d56aa4264f24df0698aed149ed994d
+----------------------------------------
+Name: PSW.docx
+From: C:/Users/User/Desktop/Work/PSW.docx
+Modified: 2024-11-23 12:27:51
+To: PSW.docx
+Backup: 2024-11-26 21:54:36
+Size: 12803 bytes
+Hash: a6e5566de83c1945723af0e9e020b95e
+----------------------------------------
+Name: Schedule.xlsm
+From: C:/Users/User/Desktop/Work/Schedule.xlsm
+Modified: 2024-05-21 19:17:52
+To: Schedule.xlsm
+Backup: 2024-11-26 21:54:36
+Size: 8339 bytes
+Hash: 3dd720ea104481a5c43bfad3c541ddb3
+----------------------------------------
+Name: file_list.txt
+From: C:/Users/User/Desktop/Work/file_list.txt
+Modified: 2024-11-23 12:29:46
+To: null
+Backup: null
+Size: 165 bytes
+Hash: 279d23c668640cf05205bd8d990b41e7
+----------------------------------------

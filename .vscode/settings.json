@@ -1,0 +1,6 @@
+{
+    "gitlens.ai.model": "",
+    "gitlens.ai.vscode.model": "",
+    "gitlens.ai.openai.url": "",
+    "files.autoSave": "onFocusChange"
+}

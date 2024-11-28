@@ -7,7 +7,7 @@ from backup_manager import BackupManager
 def set_environment_variable_to_program_path():
     """Установка переменной среды с путем к программе."""
     program_folder = os.path.dirname(os.path.abspath(__file__))
-    env_var_name = "BACKUP_PROGRAM_PATH"
+    env_var_name = "AUTOMATIC_BACKUP_TO_FLASH_DRIVE"
 
     try:
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER,

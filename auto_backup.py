@@ -1,14 +1,9 @@
 import os
 import shutil
 import psutil
-import threading
-from queue import Queue
-from tkinter import filedialog, Tk
+from win32gui import GetOpenFileNameW
 from backup_manager import BackupManager  # Предполагается, что ваш BackupManager уже существует
 
-tk_root = Tk()
-# tk_root.withdraw()  # Скрываем основное окно
-# tk_root.update()  # Обновляем окно для корректной работы
 
 def get_flash_drive():
     """Определяет первую подключенную флешку."""
@@ -17,6 +12,7 @@ def get_flash_drive():
         if 'removable' in partition.opts.lower():
             return partition.device
     return None
+
 
 def auto_backup():
     """Основная логика автоматического резервирования."""
@@ -94,6 +90,7 @@ def auto_backup():
         else:
             print("Неверный ввод. Попробуйте снова.")
 
+
 def update_selected_files(file_indices, changes, backup_manager, flash_drive_path):
     """Обновление выбранных файлов."""
     for idx in file_indices:
@@ -105,12 +102,14 @@ def update_selected_files(file_indices, changes, backup_manager, flash_drive_pat
             copy_file(entry, backup_manager, flash_drive_path)
     print("Выбранные файлы обновлены.")
 
+
 def update_all_files(changes, backup_manager, flash_drive_path):
     """Обновление всех файлов."""
     for entry, status in changes:
         if status in ("Добавить", "Обновить"):
             copy_file(entry, backup_manager, flash_drive_path)
     print("Все файлы обновлены.")
+
 
 def copy_file(entry, backup_manager, flash_drive_path):
     """Копирование файла на флешку."""
@@ -120,33 +119,63 @@ def copy_file(entry, backup_manager, flash_drive_path):
     shutil.copy2(source_file, target_file)
     print(f"Файл {entry['Name']} скопирован на флешку.")
 
+
+import win32gui
+import win32con
+import os
+
+
 def add_new_file(backup_manager):
     """Добавление нового файла в резервирование."""
-    print("Открытие диалога выбора файла...")
 
-    # Создаем объект Tk и сразу скрываем окно
-    tk_root.destroy()  # Закрываем окно Tk
+    # Перемещение текущего окна на передний план
+    current_window = win32gui.GetForegroundWindow()
 
-    # Открываем диалог выбора файла
-    new_file = filedialog.askopenfilename(title="Выберите файл для резервирования")
+    # Попытка показать окно на переднем плане
+    win32gui.ShowWindow(current_window, win32con.SW_RESTORE)  # Восстановление окна, если оно свернуто
+    win32gui.SetForegroundWindow(current_window)  # Переводим на передний план
 
-    if not new_file:
+    # Конфигурация диалога выбора файла
+    options = {
+        "Filter": "All Files\0*.*\0",
+        "Title": "Выберите файл для резервирования",
+        "File": "",
+    }
+
+    try:
+        result = win32gui.GetOpenFileNameW(**options)
+        if not result:
+            print("Файл не выбран.")
+            return
+
+        # Обработка возвращенного результата (может быть строка или кортеж)
+        if isinstance(result, tuple):
+            file_path = result[0]  # Путь к файлу в первом элементе кортежа
+        else:
+            file_path = result  # Если результат уже строка
+    except Exception as e:
+        print(f"Ошибка при выборе файла: {e}")
+        return
+
+    if not file_path:
         print("Файл не выбран.")
         return
 
+    # Создание нового элемента резервирования
     entry = {
-        "Name": os.path.basename(new_file),
-        "From": new_file,
-        "Modified": os.path.getmtime(new_file),
+        "Name": os.path.basename(file_path),
+        "From": file_path,
+        "Modified": os.path.getmtime(file_path),
         "To": "/",
         "Backup": "never",
-        "Size": os.path.getsize(new_file),
-        "Hash": backup_manager.calculate_file_hash(new_file),
+        "Size": os.path.getsize(file_path),
+        "Hash": backup_manager.calculate_file_hash(file_path),
     }
     if backup_manager.add_new_entry(entry):
         print(f"Файл {entry['Name']} добавлен в резервирование.")
     else:
         print(f"Ошибка при добавлении файла {entry['Name']} в резервирование.")
+
 
 def remove_file_from_backup(backup_manager):
     """Удаление файла из резервирования."""
@@ -165,6 +194,7 @@ def remove_file_from_backup(backup_manager):
             print("Неверный номер. Попробуйте снова.")
     except ValueError:
         print("Неверный ввод. Попробуйте снова.")
+
 
 def refresh_changes(backup_manager, flash_drive_path):
     """Обновить список изменений после добавления или удаления."""
@@ -188,6 +218,7 @@ def refresh_changes(backup_manager, flash_drive_path):
         else:
             changes.append((entry, "Добавить"))
     return changes
+
 
 if __name__ == "__main__":
     auto_backup()

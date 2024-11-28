@@ -5,3 +5,27 @@ To: /
 Backup: never
 Size: 0
 Hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+
+Name: Вес.xlsb
+From: C:\Users\User\Desktop\Work\Вес.xlsb
+Modified: 1732769900.6391203
+To: /
+Backup: never
+Size: 376980
+Hash: b6dce2443bce2c96795b1d2dba9cb02aad9497d3249f5ed13499aa5bff2a37f2
+
+Name: PSW.docx
+From: C:\Users\User\Desktop\Work\PSW.docx
+Modified: 1732354071.9135745
+To: /
+Backup: never
+Size: 12803
+Hash: 60bce0edbf0ac8cfc4ce8fba41680af5a6b4d942a35b91a8139867add887c16c
+
+Name: Таблетки204.xlsm
+From: C:\Users\User\Desktop\Здоровье\Таблетки204.xlsm
+Modified: 1732770014.7328534
+To: /
+Backup: never
+Size: 393125
+Hash: 2ffb64a14ca00692a29bb669692b4e06cd93f211786510ecc899314512e20763

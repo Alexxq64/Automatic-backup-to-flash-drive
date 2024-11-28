@@ -5,7 +5,21 @@ import hashlib
 class BackupManager:
     def __init__(self):
         """Инициализация менеджера резервирования."""
-        self.backup_file = "backup_info.txt"
+        # Имя переменной окружения
+        env_var_name = "AUTOMATIC_BACKUP_TO_FLASH_DRIVE"
+
+        # Получение пути из переменной окружения
+        backup_dir = os.getenv(env_var_name)
+
+        if not backup_dir:
+            raise EnvironmentError(f"Переменная окружения {env_var_name} не задана.")
+
+        # Убедимся, что путь существует
+        if not os.path.isdir(backup_dir):
+            raise FileNotFoundError(f"Указанный путь {backup_dir} в переменной {env_var_name} не существует.")
+
+        # Полный путь к файлу резервирования
+        self.backup_file = os.path.join(backup_dir, "backup_info.txt")
 
     def check_backup_info_exists(self):
         """Проверка наличия файла резервирования."""
